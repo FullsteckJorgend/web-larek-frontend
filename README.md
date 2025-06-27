@@ -1,431 +1,325 @@
-# Project Work: "Web Stall"
+# Проектная работа: «Веб-ларёк»
 
-Stack: HTML, SCSS, TypeScript, Webpack
-
-Project Structure:
-
-- src/ — project source files
-- src/components/ — folder with TypeScript components
-- src/components/base/ — folder with base code
-
-Important Files:
-
-- src/pages/index.html — main page HTML file
-- src/types/index.ts — types file
-- src/index.ts — application entry point
-- src/scss/styles.scss — root stylesheet
-- src/utils/constants.ts — constants file
-- src/utils/utils.ts — utility functions file
-
-## Installation and Running
-
-To install and run the project, execute:
-
-```
-npm install
-npm run start
-```
-
-or
-
-```
-yarn
-yarn start
-```
-
-## Build
-
-```
-npm run build
-```
-
-or
-
-```
-yarn build
-```
-
-## Event-driven Architecture
-
-The application uses an event-driven approach: all main interactions between modules (models, views, presenters) are performed via events. This ensures loose coupling and flexibility of the code.
-
-## Types
-
-The project uses the following main data types (interfaces), defined in `/src/types/index.ts`:
-
-1. IProduct  
-   Describes a catalog product:  
-   title, image, category, price, id, description.
-
-2. IProductBasket  
-   Describes a product in the basket:  
-   numberCard, id, title, price.
-
-3. ICard  
-   Inherits IProduct, adds a `button` flag (for displaying the "Add to basket" button).
-
-4. IProductListResponse  
-   Server response with a list of products:  
-   total (total count), items (array of products).
-
-5. IContact  
-   User contact data:  
-   email, phone.
-
-6. IDelivery  
-   Delivery data:  
-   payment (payment type: "card" | "cash" | ""), address.
-
-7. IOrderRequest  
-   Order to be sent to the server (inherits IContact and IDelivery):  
-   total, items (array of product ids), address, payment, email, phone.
-
-8. IOrderResponse  
-   Server response on successful order:  
-   id (order id), total (confirmed order amount).
-
-These types are used in all application layers:
-
-- Models — for storing and validating data.
-- Views — for displaying information.
-- Presenter — for passing data between layers and working with the API.
-
-## Data Models
-
-Models (model folder):
-
-1. DataCard  
-   Responsible for storing and managing the catalog product list. Provides methods for getting, adding, and searching products.
-
-2. DataBasket  
-   Manages the user's basket: adds and removes products, calculates the total cost, provides the list of products in the basket.
-
-3. DataContact  
-   Stores and validates user contact data (email, phone). Provides methods for updating, checking, and resetting this data.
-
-4. DataDekivery  
-   Stores and validates delivery data (address, payment method). Provides methods for updating, checking, and resetting this data.
-
-5. OrderAPI  
-   Encapsulates server interaction for order processing: sends order data and receives a response.
-
-6. CardAPI  
-   Encapsulates server interaction for products: gets the product list and individual product cards.
-
-Model responsibilities:
-
-- Store and change application data state.
-- Validate data.
-- Provide an interface for other layers (view, presenter).
-- Interact with external data sources (API).
-- Models do not contain DOM or rendering code.
-
-## Views
-
-Views (view folder)  
-Views are responsible for displaying data, working with DOM elements, updating the interface, and handling user events. They receive data from models and presenters, display it, and react to user actions, but do not contain business logic.
-
-Main classes:
-
-1. CardView  
-   Displays a product card in the catalog and in detail, manages the "Add to basket" button state.
-
-2. BasketCardView  
-   Displays a single product in the basket, manages its display and removal.
-
-3. BasketView  
-   Manages the display of the entire basket: product list, total amount, order button.
-
-4. FormView  
-   Manages the display and validation of forms (delivery, contacts), resets fields, displays errors, manages button and radio states.
-
-5. ModalView  
-   Manages modal windows: opening, closing, inserting content.
-
-6. PageView  
-   Manages main page areas: catalog, basket, layout, interface locking, basket counter display, etc.
-
-7. OrderView  
-   Displays the final message about a successful order and the amount charged.
-
-View responsibilities:
-
-- Work with the DOM: create, modify, delete elements.
-- Display data received from models/presenters.
-- React to user actions and generate events for other application layers.
-- Do not contain business logic or store application state.
-
-## Events
-
-1. catalog:updated  
-   Catalog update (render cards after loading or data change).
-
-2. product:open-full  
-   Open detailed product card in a modal window.
-
-3. basket:open-modal  
-   Open the basket in a modal window.
-
-4. modal:close  
-   Close any modal window.
-
-5. basket:add-product  
-   Add a product to the basket.
-
-6. basket:remove-product  
-   Remove a product from the basket.
-
-7. basket:counter-updated  
-   Update the basket item counter (e.g., in the site header).
-
-8. basket:summary-updated  
-   Update the basket total amount.
-
-9. basket:cards-updated  
-   Update the list of product cards in the basket.
-
-10. order:open-form  
-    Open the order form.
-
-11. order:payment-changed  
-    Change payment method.
-
-12. order:address-changed  
-    Change delivery address.
-
-13. order:delivery-validate  
-    Validate delivery data.
-
-14. order:delivery-submit  
-    Submit delivery data.
-
-15. contacts:email-changed  
-    Change email in the contacts form.
-
-16. contacts:phone-changed  
-    Change phone in the contacts form.
-
-17. contacts:validate  
-    Validate contact data.
-
-18. contacts:submit  
-    Submit contact data.
-
-19. order:success-close  
-    Close the successful order window.
-
-# Проектная работа "Веб-ларек"
+[English version below / English version is after the Russian section]
 
 Стек: HTML, SCSS, TypeScript, Webpack
 
-Структура проекта:
+## Структура проекта
 
-- src/ — исходные файлы проекта
-- src/components/ — папка с TypeScript компонентами
-- src/components/base/ — папка с базовым кодом
+- **src/** — исходные файлы проекта
+  - **components/** — TypeScript-компоненты
+    - **base/** — базовый код (абстрактные классы, событийная шина и др.)
+    - **model/** — модели данных (бизнес-логика, состояние, API)
+    - **view/** — компоненты представления (DOM, рендеринг)
+  - **types/** — интерфейсы и типы TypeScript
+  - **utils/** — утилиты и константы
+  - **scss/** — стили (SCSS)
+  - **pages/** — HTML-файлы
 
-Важные файлы:
+### Ключевые файлы
 
-- src/pages/index.html — HTML-файл главной страницы
-- src/types/index.ts — файл с типами
-- src/index.ts — точка входа приложения
-- src/scss/styles.scss — корневой файл стилей
-- src/utils/constants.ts — файл с константами
-- src/utils/utils.ts — файл с утилитами
+- `src/pages/index.html` — основной HTML-файл
+- `src/types/index.ts` — типы и интерфейсы данных
+- `src/index.ts` — точка входа приложения
+- `src/scss/styles.scss` — корневой файл стилей
+- `src/utils/constants.ts` — константы
+- `src/utils/utils.ts` — утилиты
+
+---
 
 ## Установка и запуск
 
-Для установки и запуска проекта необходимо выполнить команды:
-
-```
+```sh
 npm install
 npm run start
 ```
-
 или
-
-```
+```sh
 yarn
 yarn start
 ```
 
 ## Сборка
 
-```
+```sh
 npm run build
 ```
-
 или
-
-```
+```sh
 yarn build
 ```
 
-## Событийно-ориентированная архитектура
+---
 
-В приложении используется событийно-ориентированный подход: все основные взаимодействия между модулями (модели, представления, презентеры) осуществляются через события. Это обеспечивает слабую связанность и гибкость кода.
+## Архитектура
 
-## Типы
+Приложение построено на **событийно-ориентированной архитектуре** с разделением ответственности по принципу **MVP (Model-View-Presenter)**:
 
-В проекте используются следующие основные типы данных (интерфейсы), которые определены в файле `/src/types/index.ts`:
+- **Модели**: хранят и валидируют данные, работают с API, генерируют события при изменениях.
+- **Представления (View)**: отображают данные, работают с DOM, генерируют события при действиях пользователя.
+- **Событийная шина (EventEmitter)**: связывает модели и представления, всё взаимодействие — через события.
+- **Презентер/Точка входа**: `src/index.ts` связывает модели, представления и обработчики событий.
 
-1. IProduct  
-   Описывает товар каталога:  
-   title, image, category, price, id, description.
+### Используемые паттерны
 
-2. IProductBasket  
-   Описывает товар в корзине:  
-   numberCard, id, title, price.
+- **Событийно-ориентированный**: все взаимодействия между модулями — через события.
+- **MVP**: модели и представления не зависят друг от друга, точка входа выступает как презентер.
 
-3. ICard  
-   Наследует IProduct, добавляет флаг `button` (для отображения кнопки "В корзину").
+---
 
-4. IProductListResponse  
-   Ответ сервера со списком товаров:  
-   total (общее количество), items (массив товаров).
+## Компоненты и их назначение
 
-5. IContact  
-   Контактные данные пользователя:  
-   email, phone.
+### Базовый код (`components/base/`)
 
-6. IDelivery  
-   Данные о доставке:  
-   payment (тип оплаты: "card" | "cash" | ""), address.
+- **Component<T>**: абстрактный класс для всех view-компонентов. Методы для работы с DOM, рендеринга и обновления состояния.
+- **Model<T>**: абстрактный класс для моделей данных. Обеспечивает присвоение данных и генерацию событий.
+- **EventEmitter**: событийная шина для связи моделей и представлений.
 
-7. IOrderRequest  
-   Собранный заказ для отправки на сервер (наследует IContact и IDelivery):  
-   total, items (массив id товаров), address, payment, email, phone.
+### Модели (`components/model/`)
 
-8. IOrderResponse  
-   Ответ сервера при успешном заказе:  
-   id (id заказа), total (подтверждённая сумма заказа).
+- **DataCard**: управляет списком товаров каталога. Методы: установка/получение товаров, добавление, поиск по id.
+- **DataBasket**: управляет состоянием корзины. Методы: добавление/удаление товаров, подсчёт суммы, получение id.
+- **DataContact**: хранит и валидирует контактные данные пользователя (email, телефон).
+- **DataDekivery**: хранит и валидирует данные о доставке (адрес, способ оплаты).
+- **OrderAPI**: отправка заказа на сервер.
+- **CardAPI**: получение списка товаров с сервера.
 
-Эти типы используются во всех слоях приложения:
+### Представления (`components/view/`)
 
-- Модели — для хранения и валидации данных.
-- Представления — для отображения информации.
-- Презентер — для передачи данных между слоями и работы с API.
+- **CardView**: отображает карточку товара (каталог/детально), управляет кнопкой «В корзину».
+- **BasketCardView**: отображает товар в корзине, удаление.
+- **BasketView**: отображает корзину, сумму, кнопку оформления.
+- **FormView**: отображает и управляет формами (доставка, контакты), валидация, сброс, ошибки.
+- **ModalView**: управление модальными окнами (открытие, закрытие, вставка контента).
+- **PageView**: управление основными областями страницы (каталог, корзина, блокировка интерфейса, счётчик корзины).
+- **OrderView**: отображает сообщение об успешном заказе и сумму.
 
-## Модели данных
+---
 
-Модели (папка model):
+## Типы данных (`types/index.ts`)
 
-1. DataCard  
-   Отвечает за хранение и управление списком товаров каталога. Предоставляет методы для получения, добавления и поиска товаров.
+- **IProduct**: товар каталога (title, image, category, price, id, description)
+- **IProductBasket**: товар в корзине (numberCard, id, title, price)
+- **ICard**: расширяет IProduct, добавляет флаг `button` для отображения кнопки
+- **IProductListResponse**: ответ сервера со списком товаров (total, items)
+- **IContact**: контактные данные пользователя (email, phone)
+- **IDelivery**: данные о доставке (payment, address)
+- **IOrderRequest**: заказ для отправки на сервер (наследует IContact, IDelivery, добавляет total, items)
+- **IOrderResponse**: ответ сервера при успешном заказе (id, total)
 
-2. DataBasket  
-   Управляет корзиной пользователя: добавляет и удаляет товары, считает итоговую стоимость, предоставляет список товаров в корзине.
+---
 
-3. DataContact  
-   Хранит и валидирует контактные данные пользователя (email, телефон). Предоставляет методы для обновления, проверки и сброса этих данных.
+## Интерфейсы компонентов
 
-4. DataDekivery  
-   Хранит и валидирует данные о доставке (адрес, способ оплаты). Предоставляет методы для обновления, проверки и сброса этих данных.
+### Component<T> (базовый для всех view)
 
-5. OrderAPI  
-   Инкапсулирует работу с сервером по оформлению заказа: отправляет данные заказа и получает ответ.
+- **render(data?: Partial<T>): HTMLElement** — рендер компонента с новыми данными.
+- **setText(element, value)** — установка текстового содержимого.
+- **setImage(element, src, alt?)** — установка изображения.
+- **setDisabled(element, state)** — блокировка/разблокировка элемента.
+- **toggleClass(element, className, force?)** — переключение CSS-класса.
 
-6. CardAPI  
-   Инкапсулирует работу с сервером по товарам: получает список товаров и отдельные карточки товара.
+### Model<T> (базовый для всех моделей)
 
-Область ответственности моделей:
+- **emitChanges(event, payload?)** — генерация события при изменении модели.
 
-- Хранение и изменение состояния данных приложения.
-- Валидация данных.
-- Предоставление интерфейса для работы с данными другим слоям приложения (view, presenter).
-- Взаимодействие с внешними источниками данных (API).
-- Модели не содержат кода, связанного с DOM и отображением.
+### EventEmitter
 
-## Отображение
+- **on(event, handler)** — подписка на событие.
+- **emit(event, payload?)** — генерация события.
 
-Представления (папка view)  
-View (представления) отвечают за отображение данных, работу с DOM-элементами, обновление интерфейса и обработку пользовательских событий. Они получают данные от моделей и презентеров, отображают их, а также реагируют на действия пользователя, но не содержат бизнес-логику.
+---
 
-Основные классы:
+## Взаимодействие частей приложения
 
-1. CardView  
-   Отвечает за отображение карточки товара в каталоге и в подробном виде, управление состоянием кнопки "В корзину".
+1. **Действие пользователя** (например, клик «В корзину») инициирует событие во **View**.
+2. **View** генерирует событие через **EventEmitter**.
+3. **Точка входа** (`index.ts`) слушает события, обновляет **Model** или инициирует обновление других **View**.
+4. **Model** генерирует событие при изменении данных.
+5. **View** слушают события моделей и обновляют DOM.
 
-2. BasketCardView  
-   Отвечает за отображение отдельного товара в корзине, управление его отображением и удалением.
+Всё взаимодействие — только через события, что обеспечивает слабую связанность.
 
-3. BasketView  
-   Управляет отображением всей корзины: список товаров, итоговая сумма, кнопка оформления заказа.
+---
 
-4. FormView  
-   Управляет отображением и валидацией форм (доставка, контакты), сбрасывает поля, отображает ошибки, управляет состоянием кнопок и radio.
+## Пример: добавление товара в корзину
 
-5. ModalView  
-   Управляет отображением модальных окон, их открытием и закрытием, вставкой контента.
+1. Пользователь кликает «В корзину» в **CardView**.
+2. **CardView** генерирует событие `'basket:edit'` с id товара.
+3. **index.ts** обрабатывает `'basket:edit'`, обновляет **DataBasket**.
+4. **DataBasket** генерирует `'basket:changed'`.
+5. **BasketView** и **PageView** обновляют интерфейс корзины и счётчик.
 
-6. PageView  
-   Управляет основными областями страницы: каталог, корзина, общий лейаут, блокировка интерфейса, отображение счётчика корзины и т.д.
+---
 
-7. OrderView  
-   Отвечает за отображение итогового сообщения об успешном заказе и суммы списанных средств.
+## Резюме
 
-Область ответственности представлений:
+- **Слабая связанность** через событийную шину.
+- **Разделение ответственности**: модели (данные), представления (UI), точка входа (связь).
+- **Типобезопасность** через интерфейсы TypeScript.
+- **Расширяемость**: новые модели/представления легко добавлять.
 
-- Работа с DOM: создание, изменение, удаление элементов.
-- Отображение данных, полученных от моделей/презентеров.
-- Реакция на пользовательские действия и генерация событий для других слоёв приложения.
-- Не содержат бизнес-логику и не хранят состояние приложения.
+---
 
-## События
+---
 
-1. catalog:updated  
-   Обновление каталога товаров (рендер карточек после загрузки или изменения данных).
+# Project Work: "Web Stall"
 
-2. product:open-full  
-   Открытие подробной карточки товара в модальном окне.
+Stack: HTML, SCSS, TypeScript, Webpack
 
-3. basket:open-modal  
-   Открытие корзины в модальном окне.
+## Project Structure
 
-4. modal:close  
-   Закрытие любого модального окна.
+- **src/** — project source files
+  - **components/** — TypeScript components
+    - **base/** — base code (abstract classes, event bus, etc.)
+    - **model/** — data models (business logic, state, API)
+    - **view/** — view components (DOM interaction, rendering)
+  - **types/** — TypeScript interfaces and types
+  - **utils/** — utility functions and constants
+  - **scss/** — styles (SCSS)
+  - **pages/** — HTML files
 
-5. basket:add-product  
-   Добавление товара в корзину.
+### Key Files
 
-6. basket:remove-product  
-   Удаление товара из корзины.
+- `src/pages/index.html` — main page HTML
+- `src/types/index.ts` — data types/interfaces
+- `src/index.ts` — application entry point
+- `src/scss/styles.scss` — root stylesheet
+- `src/utils/constants.ts` — constants
+- `src/utils/utils.ts` — utility functions
 
-7. basket:counter-updated  
-   Обновление счётчика товаров в корзине (например, в шапке сайта).
+---
 
-8. basket:summary-updated  
-   Обновление итоговой суммы корзины.
+## Installation and Running
 
-9. basket:cards-updated  
-   Обновление списка карточек товаров в корзине.
+```sh
+npm install
+npm run start
+```
+or
+```sh
+yarn
+yarn start
+```
 
-10. order:open-form  
-    Открытие формы оформления заказа.
+## Build
 
-11. order:payment-changed  
-    Изменение способа оплаты.
+```sh
+npm run build
+```
+or
+```sh
+yarn build
+```
 
-12. order:address-changed  
-    Изменение адреса доставки.
+---
 
-13. order:delivery-validate  
-    Проверка валидности данных доставки.
+## Architecture Overview
 
-14. order:delivery-submit  
-    Отправка данных доставки.
+The application uses an **event-driven architecture** with a separation of concerns similar to the **MVP (Model-View-Presenter)** pattern:
 
-15. contacts:email-changed  
-    Изменение email в форме контактов.
+- **Models**: Store and validate data, interact with APIs, emit events on changes.
+- **Views**: Render data, handle DOM, emit events on user actions.
+- **Event Bus (EventEmitter)**: Decouples models and views, all communication is via events.
+- **Presenter/Entry Point**: `src/index.ts` wires up models, views, and event handlers.
 
-16. contacts:phone-changed  
-    Изменение телефона в форме контактов.
+### Architectural Patterns
 
-17. contacts:validate  
-    Проверка валидности контактных данных.
+- **Event-driven**: All interactions between modules are performed via events.
+- **MVP-like**: Models and Views are decoupled, with the entry point acting as a Presenter.
 
-18. contacts:submit  
-    Отправка контактных данных.
+---
 
-19. order:success-close  
-    Закрытие окна успешного заказа.
+## Components and Their Responsibilities
+
+### Base Code (`components/base/`)
+
+- **Component<T>**: Abstract class for all view components. Provides methods for DOM manipulation, rendering, and state updates.
+- **Model<T>**: Abstract class for data models. Handles data assignment and event emission.
+- **EventEmitter**: Event bus for communication between models and views.
+
+### Models (`components/model/`)
+
+- **DataCard**: Manages catalog product list. Methods: set/get products, add, search by id.
+- **DataBasket**: Manages basket state. Methods: add/remove products, calculate total, get all ids.
+- **DataContact**: Stores and validates user contact data (email, phone).
+- **DataDekivery**: Stores and validates delivery data (address, payment).
+- **OrderAPI**: Handles order submission to the server.
+- **CardAPI**: Handles product list retrieval from the server.
+
+### Views (`components/view/`)
+
+- **CardView**: Renders a product card (catalog or full view), manages "Add to basket" button.
+- **BasketCardView**: Renders a product in the basket, handles removal.
+- **BasketView**: Renders the basket, total price, and order button.
+- **FormView**: Renders and manages forms (delivery, contacts), validation, reset, error display.
+- **ModalView**: Manages modal windows (open, close, insert content).
+- **PageView**: Manages main page areas (catalog, basket, layout, interface lock, basket counter).
+- **OrderView**: Displays order success message and amount.
+
+---
+
+## Data Types (`types/index.ts`)
+
+- **IProduct**: Catalog product (title, image, category, price, id, description)
+- **IProductBasket**: Product in basket (numberCard, id, title, price)
+- **ICard**: Extends IProduct, adds `button` flag for "Add to basket"
+- **IProductListResponse**: Server response with product list (total, items)
+- **IContact**: User contact data (email, phone)
+- **IDelivery**: Delivery data (payment, address)
+- **IOrderRequest**: Order to send to server (extends IContact, IDelivery, adds total, items)
+- **IOrderResponse**: Server response on successful order (id, total)
+
+---
+
+## Component Interfaces
+
+### Component<T> (base for all views)
+
+- **render(data?: Partial<T>): HTMLElement** — renders the component with new data.
+- **setText(element, value)** — sets text content.
+- **setImage(element, src, alt?)** — sets image source and alt.
+- **setDisabled(element, state)** — enables/disables element.
+- **toggleClass(element, className, force?)** — toggles CSS class.
+
+### Model<T> (base for all models)
+
+- **emitChanges(event, payload?)** — emits an event when model changes.
+
+### EventEmitter
+
+- **on(event, handler)** — subscribe to event.
+- **emit(event, payload?)** — emit event.
+
+---
+
+## Interaction Flow
+
+1. **User Action** (e.g., clicks "Add to basket") triggers a **View** event.
+2. **View** emits an event via **EventEmitter**.
+3. **Entry Point** (`index.ts`) listens for events, updates **Model** or triggers another **View** update.
+4. **Model** emits change events when data updates.
+5. **Views** listen for model change events and update the DOM accordingly.
+
+All communication is via events, ensuring loose coupling.
+
+---
+
+## Example: Adding Product to Basket
+
+1. User clicks "Add to basket" in **CardView**.
+2. **CardView** emits `'basket:edit'` with product id.
+3. **index.ts** handles `'basket:edit'`, updates **DataBasket**.
+4. **DataBasket** emits `'basket:changed'`.
+5. **BasketView** and **PageView** update basket UI and counter.
+
+---
+
+## Summary
+
+- **Loose coupling** via event bus.
+- **Separation of concerns**: models (data), views (UI), entry point (wiring).
+- **Type safety** via TypeScript interfaces.
+- **Extensible**: new models/views can be added with minimal changes.
+
+---
