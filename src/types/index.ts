@@ -1,39 +1,49 @@
 // Product — Товар
-export interface Product {
+export interface IProduct {
+  title: string;  // Название товара
+  image: string;  // Путь к изображению
+  category: string;   // Категория товара
+  price: number | null; // Цена (может быть null)
   id: string;               // Уникальный идентификатор товара
-  title: string;            // Название товара
   description: string;      // Описание
-  image: string;            // Путь к изображению
-  category: string;         // Категория товара
-  price: number | null;     // Цена (может быть null)
+}
+
+export interface IProductBasket {
+  numberCard: number;
+  id: string;               // Уникальный идентификатор товара
+  title: string;  // Название товара
+  price: number | null;  // Цена (может быть null)
+}
+
+export interface ICard extends IProduct {
+  button: boolean; // Кнопка для добавления в корзину
 }
 
 // ProductListResponse — Список товаров
-export interface ProductListResponse {
+export interface IProductListResponse {
   total: number;       // Общее количество товаров
-  items: Product[];    // Список товаров
+  items: IProduct[];    // Список товаров
 }
 
-
-// OrderRequest — Заказ
-export interface OrderRequest {
-  payment: "online" | "cash";  // Способ оплаты
+export interface IContact {
   email: string;               // Email покупателя
   phone: string;               // Телефон
+}
+
+export interface IDelivery {
+  payment: "card" | "cash" | "";  // Способ оплаты
   address: string;             // Адрес доставки
+}
+
+// OrderRequest — Собранный заказ
+export interface IOrderRequest extends IContact, IDelivery {
   total: number;               // Сумма заказа
   items: string[];             // Массив ID товаров
 }
 
 
 // OrderResponse — Ответ при успешном заказе
-export interface OrderResponse {
+export interface IOrderResponse {
   id: string;       // ID заказа
   total: number;    // Подтвержденная сумма заказа
-}
-
-
-// ErrorResponse — Ошибка
-export interface ErrorResponse {
-  error: string;     // Сообщение об ошибке
 }
