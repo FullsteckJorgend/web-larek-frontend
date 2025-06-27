@@ -1,6 +1,169 @@
-# Проектная работа: «Веб-ларёк»
+# Project Work: "Web Stall"
 
-[English version below / English version is after the Russian section]
+Stack: HTML, SCSS, TypeScript, Webpack
+
+## Project Structure
+
+- **src/** — project source files
+  - **components/** — TypeScript components
+    - **base/** — base code (abstract classes, event bus, etc.)
+    - **model/** — data models (business logic, state, API)
+    - **view/** — view components (DOM interaction, rendering)
+  - **types/** — TypeScript interfaces and types
+  - **utils/** — utility functions and constants
+  - **scss/** — styles (SCSS)
+  - **pages/** — HTML files
+
+### Key Files
+
+- `src/pages/index.html` — main page HTML
+- `src/types/index.ts` — data types/interfaces
+- `src/index.ts` — application entry point
+- `src/scss/styles.scss` — root stylesheet
+- `src/utils/constants.ts` — constants
+- `src/utils/utils.ts` — utility functions
+
+---
+
+## Installation and Running
+
+```sh
+npm install
+npm run start
+```
+
+or
+
+```sh
+yarn
+yarn start
+```
+
+## Build
+
+```sh
+npm run build
+```
+
+or
+
+```sh
+yarn build
+```
+
+---
+
+## Architecture Overview
+
+The application uses an **event-driven architecture** with a separation of concerns similar to the **MVP (Model-View-Presenter)** pattern:
+
+- **Models**: Store and validate data, interact with APIs, emit events on changes.
+- **Views**: Render data, handle DOM, emit events on user actions.
+- **Event Bus (EventEmitter)**: Decouples models and views, all communication is via events.
+- **Presenter/Entry Point**: `src/index.ts` wires up models, views, and event handlers.
+
+### Architectural Patterns
+
+- **Event-driven**: All interactions between modules are performed via events.
+- **MVP-like**: Models and Views are decoupled, with the entry point acting as a Presenter.
+
+---
+
+## Components and Their Responsibilities
+
+### Base Code (`components/base/`)
+
+- **Component<T>**: Abstract class for all view components. Provides methods for DOM manipulation, rendering, and state updates.
+- **Model<T>**: Abstract class for data models. Handles data assignment and event emission.
+- **EventEmitter**: Event bus for communication between models and views.
+
+### Models (`components/model/`)
+
+- **DataCard**: Manages catalog product list. Methods: set/get products, add, search by id.
+- **DataBasket**: Manages basket state. Methods: add/remove products, calculate total, get all ids.
+- **DataContact**: Stores and validates user contact data (email, phone).
+- **DataDekivery**: Stores and validates delivery data (address, payment).
+- **OrderAPI**: Handles order submission to the server.
+- **CardAPI**: Handles product list retrieval from the server.
+
+### Views (`components/view/`)
+
+- **CardView**: Renders a product card (catalog or full view), manages "Add to basket" button.
+- **BasketCardView**: Renders a product in the basket, handles removal.
+- **BasketView**: Renders the basket, total price, and order button.
+- **FormView**: Renders and manages forms (delivery, contacts), validation, reset, error display.
+- **ModalView**: Manages modal windows (open, close, insert content).
+- **PageView**: Manages main page areas (catalog, basket, layout, interface lock, basket counter).
+- **OrderView**: Displays order success message and amount.
+
+---
+
+## Data Types (`types/index.ts`)
+
+- **IProduct**: Catalog product (title, image, category, price, id, description)
+- **IProductBasket**: Product in basket (numberCard, id, title, price)
+- **ICard**: Extends IProduct, adds `button` flag for "Add to basket"
+- **IProductListResponse**: Server response with product list (total, items)
+- **IContact**: User contact data (email, phone)
+- **IDelivery**: Delivery data (payment, address)
+- **IOrderRequest**: Order to send to server (extends IContact, IDelivery, adds total, items)
+- **IOrderResponse**: Server response on successful order (id, total)
+
+---
+
+## Component Interfaces
+
+### Component<T> (base for all views)
+
+- **render(data?: Partial<T>): HTMLElement** — renders the component with new data.
+- **setText(element, value)** — sets text content.
+- **setImage(element, src, alt?)** — sets image source and alt.
+- **setDisabled(element, state)** — enables/disables element.
+- **toggleClass(element, className, force?)** — toggles CSS class.
+
+### Model<T> (base for all models)
+
+- **emitChanges(event, payload?)** — emits an event when model changes.
+
+### EventEmitter
+
+- **on(event, handler)** — subscribe to event.
+- **emit(event, payload?)** — emit event.
+
+---
+
+## Interaction Flow
+
+1. **User Action** (e.g., clicks "Add to basket") triggers a **View** event.
+2. **View** emits an event via **EventEmitter**.
+3. **Entry Point** (`index.ts`) listens for events, updates **Model** or triggers another **View** update.
+4. **Model** emits change events when data updates.
+5. **Views** listen for model change events and update the DOM accordingly.
+
+All communication is via events, ensuring loose coupling.
+
+---
+
+## Example: Adding Product to Basket
+
+1. User clicks "Add to basket" in **CardView**.
+2. **CardView** emits `'basket:edit'` with product id.
+3. **index.ts** handles `'basket:edit'`, updates **DataBasket**.
+4. **DataBasket** emits `'basket:changed'`.
+5. **BasketView** and **PageView** update basket UI and counter.
+
+---
+
+## Summary
+
+- **Loose coupling** via event bus.
+- **Separation of concerns**: models (data), views (UI), entry point (wiring).
+- **Type safety** via TypeScript interfaces.
+- **Extensible**: new models/views can be added with minimal changes.
+
+---
+
+# Проектная работа: «Веб-ларёк»
 
 Стек: HTML, SCSS, TypeScript, Webpack
 
@@ -33,7 +196,9 @@
 npm install
 npm run start
 ```
+
 или
+
 ```sh
 yarn
 yarn start
@@ -44,7 +209,9 @@ yarn start
 ```sh
 npm run build
 ```
+
 или
+
 ```sh
 yarn build
 ```
@@ -160,166 +327,5 @@ yarn build
 - **Расширяемость**: новые модели/представления легко добавлять.
 
 ---
-
----
-
-# Project Work: "Web Stall"
-
-Stack: HTML, SCSS, TypeScript, Webpack
-
-## Project Structure
-
-- **src/** — project source files
-  - **components/** — TypeScript components
-    - **base/** — base code (abstract classes, event bus, etc.)
-    - **model/** — data models (business logic, state, API)
-    - **view/** — view components (DOM interaction, rendering)
-  - **types/** — TypeScript interfaces and types
-  - **utils/** — utility functions and constants
-  - **scss/** — styles (SCSS)
-  - **pages/** — HTML files
-
-### Key Files
-
-- `src/pages/index.html` — main page HTML
-- `src/types/index.ts` — data types/interfaces
-- `src/index.ts` — application entry point
-- `src/scss/styles.scss` — root stylesheet
-- `src/utils/constants.ts` — constants
-- `src/utils/utils.ts` — utility functions
-
----
-
-## Installation and Running
-
-```sh
-npm install
-npm run start
-```
-or
-```sh
-yarn
-yarn start
-```
-
-## Build
-
-```sh
-npm run build
-```
-or
-```sh
-yarn build
-```
-
----
-
-## Architecture Overview
-
-The application uses an **event-driven architecture** with a separation of concerns similar to the **MVP (Model-View-Presenter)** pattern:
-
-- **Models**: Store and validate data, interact with APIs, emit events on changes.
-- **Views**: Render data, handle DOM, emit events on user actions.
-- **Event Bus (EventEmitter)**: Decouples models and views, all communication is via events.
-- **Presenter/Entry Point**: `src/index.ts` wires up models, views, and event handlers.
-
-### Architectural Patterns
-
-- **Event-driven**: All interactions between modules are performed via events.
-- **MVP-like**: Models and Views are decoupled, with the entry point acting as a Presenter.
-
----
-
-## Components and Their Responsibilities
-
-### Base Code (`components/base/`)
-
-- **Component<T>**: Abstract class for all view components. Provides methods for DOM manipulation, rendering, and state updates.
-- **Model<T>**: Abstract class for data models. Handles data assignment and event emission.
-- **EventEmitter**: Event bus for communication between models and views.
-
-### Models (`components/model/`)
-
-- **DataCard**: Manages catalog product list. Methods: set/get products, add, search by id.
-- **DataBasket**: Manages basket state. Methods: add/remove products, calculate total, get all ids.
-- **DataContact**: Stores and validates user contact data (email, phone).
-- **DataDekivery**: Stores and validates delivery data (address, payment).
-- **OrderAPI**: Handles order submission to the server.
-- **CardAPI**: Handles product list retrieval from the server.
-
-### Views (`components/view/`)
-
-- **CardView**: Renders a product card (catalog or full view), manages "Add to basket" button.
-- **BasketCardView**: Renders a product in the basket, handles removal.
-- **BasketView**: Renders the basket, total price, and order button.
-- **FormView**: Renders and manages forms (delivery, contacts), validation, reset, error display.
-- **ModalView**: Manages modal windows (open, close, insert content).
-- **PageView**: Manages main page areas (catalog, basket, layout, interface lock, basket counter).
-- **OrderView**: Displays order success message and amount.
-
----
-
-## Data Types (`types/index.ts`)
-
-- **IProduct**: Catalog product (title, image, category, price, id, description)
-- **IProductBasket**: Product in basket (numberCard, id, title, price)
-- **ICard**: Extends IProduct, adds `button` flag for "Add to basket"
-- **IProductListResponse**: Server response with product list (total, items)
-- **IContact**: User contact data (email, phone)
-- **IDelivery**: Delivery data (payment, address)
-- **IOrderRequest**: Order to send to server (extends IContact, IDelivery, adds total, items)
-- **IOrderResponse**: Server response on successful order (id, total)
-
----
-
-## Component Interfaces
-
-### Component<T> (base for all views)
-
-- **render(data?: Partial<T>): HTMLElement** — renders the component with new data.
-- **setText(element, value)** — sets text content.
-- **setImage(element, src, alt?)** — sets image source and alt.
-- **setDisabled(element, state)** — enables/disables element.
-- **toggleClass(element, className, force?)** — toggles CSS class.
-
-### Model<T> (base for all models)
-
-- **emitChanges(event, payload?)** — emits an event when model changes.
-
-### EventEmitter
-
-- **on(event, handler)** — subscribe to event.
-- **emit(event, payload?)** — emit event.
-
----
-
-## Interaction Flow
-
-1. **User Action** (e.g., clicks "Add to basket") triggers a **View** event.
-2. **View** emits an event via **EventEmitter**.
-3. **Entry Point** (`index.ts`) listens for events, updates **Model** or triggers another **View** update.
-4. **Model** emits change events when data updates.
-5. **Views** listen for model change events and update the DOM accordingly.
-
-All communication is via events, ensuring loose coupling.
-
----
-
-## Example: Adding Product to Basket
-
-1. User clicks "Add to basket" in **CardView**.
-2. **CardView** emits `'basket:edit'` with product id.
-3. **index.ts** handles `'basket:edit'`, updates **DataBasket**.
-4. **DataBasket** emits `'basket:changed'`.
-5. **BasketView** and **PageView** update basket UI and counter.
-
----
-
-## Summary
-
-- **Loose coupling** via event bus.
-- **Separation of concerns**: models (data), views (UI), entry point (wiring).
-- **Type safety** via TypeScript interfaces.
-- **Extensible**: new models/views can be added with minimal changes.
 
 ---
