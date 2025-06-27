@@ -1,5 +1,4 @@
 # Project Work: "Web Stall"
-
 Stack: HTML, SCSS, TypeScript, Webpack
 
 Project Structure:
@@ -44,6 +43,10 @@ or
 ```
 yarn build
 ```
+
+## Event-driven Architecture
+
+The application uses an event-driven approach: all main interactions between modules (models, views, presenters) are performed via events. This ensures loose coupling and flexibility of the code.
 
 ## Types
 
@@ -209,9 +212,7 @@ View responsibilities:
 
 19. order:success-close  
     Close the successful order window.
-
 # Проектная работа "Веб-ларек"
-
 Стек: HTML, SCSS, TS, Webpack
 
 Структура проекта:
@@ -256,6 +257,10 @@ npm run build
 ```
 yarn build
 ```
+
+## Событийно-ориентированная архитектура
+
+В приложении используется событийно-ориентированный подход: все основные взаимодействия между модулями (модели, представления, презентеры) осуществляются через события. Это обеспечивает слабую связанность и гибкость кода.
 
 ### Типы
 
