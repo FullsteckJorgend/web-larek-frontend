@@ -45,7 +45,6 @@ const viewFormContact = new FormView(contactsFormElement, eventsHub);
 
 const dataDekivery = new DataDekivery(eventsHub);
 const dataContact = new DataContact(eventsHub);
-const viewOrder = new OrderView(successElement, eventsHub);
 
 // --- ЗАГРУЗКА КАТАЛОГА ---
 apiCard
@@ -102,6 +101,10 @@ eventsHub.on('basket:open', () => {
 // --- ЗАКРЫТИЕ МОДАЛОК ---
 eventsHub.on('button:close', () => {
 	viewModal.close();
+});
+
+// --- ВКЛЮЧЕНИЕ СКРОЛЛ ---
+eventsHub.on('modal:close', () => {
 	viewPage.locked = false;
 });
 
@@ -139,7 +142,7 @@ eventsHub.on('basket:changed', () => {
 		cardBasketView.numberCard = indexCard;
 		return cardBasketView.render(data);
 	});
-	viewPage.basket = cardElements;
+	viewBasket.basket = cardElements;
 });
 
 // --- УДАЛЕНИЕ КАРТОЧЕК КОРЗИНЫ ---
@@ -199,25 +202,30 @@ eventsHub.on('contacts:submit', () => {
 		items: dataBasket.allIds,
 		total: dataBasket.totalPrice,
 	};
-	console.log(server);
 	orderAPI
 		.postOrder(server)
 		.then((data: IOrderResponse) => {
-			console.log(data);
+			const successElement = successTemplate.content.cloneNode(
+				true
+			) as HTMLElement;
+			const viewOrder = new OrderView(successElement, eventsHub);
 			viewModal.render({
 				content: successElement,
 			});
 			viewOrder.price = dataBasket.totalPrice;
 			viewPage.locked = true;
-			dataBasket.clear();
-			dataContact.clear();
-			dataDekivery.clear();
 			viewFormDekivery.reset();
 			viewFormContact.reset();
 		})
 		.catch((error) => {
 			console.error('Ошибка при отправки запроса:', error);
 		});
+});
+
+eventsHub.on('data:clear', () => {
+	dataBasket.clear();
+	dataContact.clear();
+	dataDekivery.clear();
 });
 
 eventsHub.on('order:end', () => {

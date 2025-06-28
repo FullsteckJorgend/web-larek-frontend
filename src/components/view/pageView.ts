@@ -37,10 +37,6 @@ export class PageView extends Component<IPage> {
 		this._catalog.replaceChildren(...items);
 	}
 
-	set basket(items: HTMLElement[]) {
-		this._basketList.replaceChildren(...items);
-	}
-
 	set locked(value: boolean) {
 		if (value) {
 			this._wrapper.classList.add('page__wrapper_locked');

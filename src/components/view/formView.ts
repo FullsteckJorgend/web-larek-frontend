@@ -76,6 +76,7 @@ export class FormView<T> extends Component<IFormState> {
 	 * потере пользовательского ввода и рассинхронизации интерфейса.
 	 */
 	public reset(): void {
+		this.events.emit('data:clear')
 		this.container.reset();
 		this.errors = '';
 		this.restartRadioButton?.();
